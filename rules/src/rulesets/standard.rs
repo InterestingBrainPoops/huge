@@ -1,5 +1,3 @@
-use crate::board::Snake;
-
 use super::Ruleset;
 
 pub struct Standard;

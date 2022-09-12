@@ -1,28 +1,39 @@
 use std::ops::Add;
 
+/// The board container.
 pub struct Board {
+    /// Height of the board
     pub height: u32,
+    /// Width of the board
     pub width: u32,
+    /// The hazards
     pub hazards: Vec<Coordinate>,
+    /// The hazard damage that gets applied per hazard piece.
+    /// its not unsigned because health can be increased by hazards (See healing pools)
     pub hazard_damage: i32,
+    /// A vector holding all of the food that is on the board
     pub food: Vec<Coordinate>,
+    /// The snakes that are currently alive
     pub snakes: Vec<Snake>,
 }
 
 impl Board {
+    /// Wrap any snakes that are out of bounds, run this BEFORE [Self::out_of_bounds_elims] if you want wrapped behaviour.
     pub fn maybe_wrap_snakes(&mut self) {
         for snake in &mut self.snakes {
-            if snake.head().x < 0 {
-                snake.
-            } 
+            snake.body[0].x %= self.width as i32 - 1;
+            snake.body[0].y %= self.height as i32 - 1;
         }
     }
 
-    pub fn apply_hazards(&mut self) {
-        for snake in &mut self.snakes {
-            if self.hazards.contains(&snake.head()) {
-                snake.health -= self.hazard_damage;
-                snake.health = snake.health.min(100);
+    /// Apply hazard damage
+    pub fn apply_hazard_damage(&mut self) {
+        for hazard in &self.hazards {
+            for snake in &mut self.snakes {
+                if snake.head() == *hazard {
+                    snake.health -= self.hazard_damage;
+                    snake.health = snake.health.min(100);
+                }
             }
         }
     }
@@ -88,7 +99,7 @@ impl Board {
     }
 
     /// Eliminates snakes if they are out of bounds
-    /// Does not account for wrapped-ness, so run the .wrap() function BEFORE this if you need that behaviour
+    /// Does not account for wrapped-ness, so run the [Self::maybe_wrap_snakes] function BEFORE this if you need that behaviour
     pub fn out_of_bounds_elims(&mut self) {
         let mut new_snakes = vec![];
         for snake in &self.snakes {
@@ -168,35 +179,54 @@ impl Snake {
             SnakeMove::new(Direction::Down, self.id),
         ]
     }
-
+    /// Get the head of the snake
     fn head(&self) -> Coordinate {
         self.body[0]
     }
 }
 
+/// Base coordinate type, this is with the coordinate system of the bottom left being (0,0)
+/// Negative for convienience, especially with negative out of bounds checking
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
 pub struct Coordinate {
     pub x: i32,
     pub y: i32,
 }
 
+impl Coordinate {
+    pub fn new(x: i32, y: i32) -> Coordinate {
+        Coordinate { x, y }
+    }
+}
+
 impl Add<Coordinate> for Coordinate {
     type Output = Coordinate;
 
     fn add(self, rhs: Coordinate) -> Self::Output {
-        todo!()
+        Coordinate::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 impl Add<Direction> for Coordinate {
     type Output = Coordinate;
 
     fn add(self, rhs: Direction) -> Self::Output {
-        todo!()
+        let rhs = match rhs {
+            Direction::Up => Coordinate::new(0, 1),
+            Direction::Down => Coordinate::new(0, -1),
+            Direction::Left => Coordinate::new(-1, 0),
+            Direction::Right => Coordinate::new(1, 0),
+        };
+
+        rhs + self
     }
 }
+
+/// A holder for a move made by a snake
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
 pub struct SnakeMove {
+    /// ID of the snake
     pub id: usize,
+    /// Direction the snake is moving.
     pub direction: Direction,
 }
 
