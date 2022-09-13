@@ -1,5 +1,8 @@
 [workspace]
 
 members = [
-    "rules"
+    "rules",
+    "mcts",
+    "game",
+    "eval",
 ]
