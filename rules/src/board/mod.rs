@@ -1,5 +1,6 @@
 use std::ops::Add;
 
+#[derive(Clone)]
 /// The board container.
 pub struct Board {
     /// Height of the board

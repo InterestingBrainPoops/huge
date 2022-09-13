@@ -1,3 +1,6 @@
+use game::Game;
+use rules::board::Board;
+
 pub trait Evaluation {
-    pub fn 
+    fn calculate(&self, game: &Game) -> f64;
 }

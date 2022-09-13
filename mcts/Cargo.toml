@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 rules = { path = "../rules" }
+eval = {path = "../eval"}
+game = {path = "../game"}
