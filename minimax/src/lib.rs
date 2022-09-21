@@ -20,11 +20,35 @@ struct Value {
     score: f64,
 }
 
+#[derive(Clone, Copy)]
 pub struct Decision {
     direction: Direction,
     score: f64,
 }
+// credit for this goes to https://rosettacode.org/wiki/Cartesian_product_of_two_or_more_lists#Rust
+// modified the return and input types
+fn cartesian_product(lists: &Vec<Vec<SnakeMove>>) -> Vec<Vec<SnakeMove>> {
+    let mut res = vec![];
 
+    let mut list_iter = lists.iter();
+    if let Some(first_list) = list_iter.next() {
+        for &i in first_list {
+            res.push(vec![i]);
+        }
+    }
+    for l in list_iter {
+        let mut tmp = vec![];
+        for r in res {
+            for &el in l {
+                let mut tmp_el = r.clone();
+                tmp_el.push(el);
+                tmp.push(tmp_el);
+            }
+        }
+        res = tmp;
+    }
+    res
+}
 impl<R: Ruleset, E: Evaluation> MinimaxTreeSearch<R, E> {
     pub fn new(ruleset: R, eval: E, origin: Game) -> MinimaxTreeSearch<R, E> {
         MinimaxTreeSearch {
@@ -42,7 +66,11 @@ impl<R: Ruleset, E: Evaluation> MinimaxTreeSearch<R, E> {
         }
     }
     fn generate_all_moves(&self, you_move: SnakeMove) -> Vec<Vec<SnakeMove>> {
-        todo!();
+        let mut all_moves = vec![];
+        for x in 0..self.root. {
+            all_moves.push(x.get_moves());
+        }
+        cartesian_product(all_moves)
     }
     fn minimax(
         &mut self,
