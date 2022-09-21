@@ -1,5 +1,3 @@
-use std::cell::{RefCell, RefMut};
-
 use eval::Evaluation;
 use game::Game;
 use rules::rulesets::Ruleset;
@@ -40,7 +38,7 @@ impl Node {
             + 2_f64.sqrt() * ((parent_visits as f64).ln() / (self.num_visits as f64)).sqrt()
     }
     fn fill(&mut self) {
-        todo!();
+        assert!(self.children.is_empty());
     }
 }
 
@@ -74,7 +72,7 @@ impl<R: Ruleset, E: Evaluation> MonteCarloTreeSearch<R, E> {
         let leaf_path = &path[0..(path.len() - 1)];
         let leaf_node = self.get(leaf_path);
 
-        if self.ruleset.game_over(&leaf_node.state.board) {
+        if self.ruleset.game_over(&leaf_node.state.board).is_some() {
             return true;
         }
 
